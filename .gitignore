@@ -1,0 +1,10 @@
+# instaladores e imagens não vão para o repositório
+*.exe
+*.msi
+*.iso
+*.wim
+*.esd
+# arquivos com segredos
+*.key
+*senha*
+*password*

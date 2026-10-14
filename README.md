@@ -33,7 +33,7 @@ instalacao/                     vai para a área de trabalho da máquina
   instaladores/                 instaladores offline (não vão para o GitHub)
 ```
 
-Para adicionar um programa, basta criar um novo `instalacao\apps\instalar-<programa>.bat` e colocar o instalador na pasta `instaladores`.
+Para adicionar um programa, veja [Como adicionar outro programa](#como-adicionar-outro-programa).
 
 ## Windows enxuto para uso corporativo
 
@@ -64,22 +64,48 @@ Um pendrive de instalação pode ser perdido ou copiado, então ele **não guard
 
 1. **Crie o pendrive de instalação do Windows 11** normalmente, com a Ferramenta de Criação de Mídia da Microsoft ou com o Rufus.
    - No **Rufus**, quando aparecer a janela de personalização do Windows (remover requisitos, criar conta local etc.), **desmarque todas as opções**. Elas fazem o Rufus gerar um `Autounattend.xml` próprio, que entra em conflito com este.
-2. **Baixe o instalador offline do Brave** (`BraveBrowserStandaloneSilentSetup.exe`, no GitHub oficial do Brave) e coloque dentro de `instalacao\instaladores`.
-3. **Copie para a raiz do pendrive**, ao lado dos arquivos do Windows, o `Autounattend.xml` e a pasta `instalacao`. Não coloque nada dentro das pastas do instalador do Windows:
+2. **Baixe os instaladores dos programas.** Este repositório não traz os instaladores (são arquivos grandes e de outras empresas). Para o exemplo do Brave, baixe o `BraveBrowserStandaloneSilentSetup.exe` no [GitHub oficial do Brave](https://github.com/brave/brave-browser/releases) (versão mais recente, em "Assets").
+3. **Monte o pendrive.** Na **raiz** do pendrive, ao lado dos arquivos do Windows, ficam só **duas coisas** deste projeto: o arquivo `Autounattend.xml` e a pasta `instalacao`. A pasta `instaladores` vai **dentro** da pasta `instalacao`, e não ao lado do XML. O pendrive completo fica assim:
 
    ```
    PENDRIVE (E:)
-   ├── boot\                (do instalador do Windows, não mexer)
-   ├── efi\                 (do instalador do Windows, não mexer)
-   ├── sources\             (do instalador do Windows, não mexer)
-   ├── setup.exe            (do instalador do Windows, não mexer)
-   ├── Autounattend.xml     <- deste projeto, obrigatoriamente na raiz
-   └── instalacao\          <- deste projeto
+   ├── boot\  efi\  sources\  setup.exe ...      (do instalador do Windows, não mexer)
+   │
+   ├── Autounattend.xml                          ← deste projeto, na raiz
+   └── instalacao\                               ← deste projeto, na raiz
+       ├── INSTALAR.bat                          ← já vem no projeto
+       ├── otimizar-windows.ps1                  ← já vem no projeto
+       ├── apps\
+       │   └── instalar-brave.bat                ← já vem no projeto (um script por programa)
+       └── instaladores\
+           ├── LEIA-ME.txt                       ← já vem no projeto
+           └── BraveBrowserStandaloneSilentSetup.exe   ← VOCÊ baixa e coloca aqui
    ```
+
+   | Pasta | O que tem dentro | De onde vem |
+   |---|---|---|
+   | `instalacao\apps` | Um script `instalar-<programa>.bat` para cada programa | Deste repositório |
+   | `instalacao\instaladores` | O instalador **offline** de cada programa, com o **nome exato** que o script espera | Você baixa do site oficial de cada programa |
 
    O instalador do Windows procura o `Autounattend.xml` sozinho na raiz do pendrive, e a cópia procura a pasta `instalacao` na raiz de qualquer unidade.
 4. **Inicie a máquina pelo pendrive** (menu de boot da placa-mãe) e espere chegar na área de trabalho.
 5. **Abra a pasta Instalacao** na área de trabalho e dê dois cliques em **`INSTALAR.bat`**.
+
+### Como adicionar outro programa
+
+Cada programa precisa de **duas coisas**: o **instalador** na pasta `instaladores` e um **script** na pasta `apps`.
+
+1. Baixe o instalador **offline** (que traz o programa inteiro, sem precisar de internet) do site oficial e coloque em `instalacao\instaladores`.
+2. Descubra o parâmetro de **instalação silenciosa** dele (sem janelas). Os mais comuns: `/S`, `/silent`, `/quiet` ou, para arquivos `.msi`, `msiexec /i arquivo.msi /qn`.
+3. Copie o `instalar-brave.bat`, renomeie (por exemplo, `instalar-7zip.bat`) e ajuste três linhas: o nome do arquivo do instalador, o caminho onde o programa fica depois de instalado e o comando de instalação. Exemplo para o 7-Zip (instalador `.msi`):
+
+   ```bat
+   set "ARQUIVO=7z-x64.msi"
+   set "PROGRAMA_EXE=%ProgramFiles%\7-Zip\7zFM.exe"
+   msiexec /i "%~dp0..\instaladores\%ARQUIVO%" /qn /norestart
+   ```
+
+O `INSTALAR.bat` encontra sozinho todos os `instalar-*.bat` da pasta `apps` e roda em ordem alfabética.
 
 > **Atenção:** o `Autounattend.xml` **apaga todo o disco 0** da máquina. Teste antes numa máquina virtual (Hyper-V ou VirtualBox).
 

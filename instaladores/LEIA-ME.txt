@@ -1,0 +1,6 @@
+Coloque aqui os instaladores offline dos programas (eles NAO vao para o GitHub).
+
+Para o Brave:
+  BraveBrowserStandaloneSilentSetup.exe
+  Baixe do GitHub oficial do Brave: https://github.com/brave/brave-browser/releases
+  (na versao mais recente, em "Assets").

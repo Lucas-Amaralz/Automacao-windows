@@ -1,4 +1,6 @@
 # instaladores e imagens não vão para o repositório
+instaladores/*
+!instaladores/LEIA-ME.txt
 *.exe
 *.msi
 *.iso

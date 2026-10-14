@@ -41,10 +41,11 @@ Pensado para máquinas fracas: só fica o que serve para trabalhar.
 
 **Removido:**
 - **Jogos e Xbox:** Solitaire, Xbox, Game Bar e gravação de jogos em segundo plano.
-- **Apps de consumidor:** Notícias, Clima, Mapas, Clipchamp, Vincular ao Celular, Pessoas, Dicas, Hub de Comentários, Obter Ajuda, Mail e Calendário antigos, Teams pessoal, Dev Home, Copilot, Cortana, o atalho "Microsoft 365 (Office)" e o "Novo Outlook".
+- **Apps de consumidor:** Notícias, Clima, Mapas, Clipchamp, Vincular ao Celular e integração com o celular pessoal, Pessoas, Dicas, Hub de Comentários, Obter Ajuda, Mail e Calendário antigos, Teams pessoal, Dev Home, Copilot, Cortana, o atalho "Microsoft 365 (Office)" e o "Novo Outlook".
 - **Propaganda e sugestões:** apps que se instalam sozinhos, sugestões no Iniciar, dicas, ID de anúncios e Widgets.
 - **Recursos pesados:** transparência, animações, hibernação (libera no disco o tamanho da RAM), Recall e o Edge rodando em segundo plano.
-- **Barra de tarefas:** sem Widgets e Visão de Tarefas, pesquisa como ícone e sem sugestões da Bing.
+- **Barra de tarefas:** só Explorador de Arquivos e Edge fixados (sai, por exemplo, o atalho que baixa o "Novo Outlook"), sem Widgets e Visão de Tarefas, pesquisa como ícone e sem sugestões da Bing.
+- **Área de trabalho:** sem o Destaque do Windows ("Saiba mais sobre esta imagem").
 
 **Mantido (útil no trabalho):** Edge, Loja, OneDrive, Assistência Rápida (suporte remoto), Calculadora, Bloco de Notas, Paint, Fotos, Ferramenta de Captura, Notas Autoadesivas, To Do, Terminal e Media Player.
 

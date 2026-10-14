@@ -13,10 +13,16 @@
 $ErrorActionPreference = 'Continue'
 Start-Transcript -Path 'C:\Windows\Temp\otimizacao.log' -Append | Out-Null
 
+# grava um valor no registro; se o Windows bloquear algum item, anota no log e segue para o proximo
 function Set-Valor {
     param([string]$Caminho, [string]$Nome, $Valor, [string]$Tipo = 'DWord')
-    if (-not (Test-Path $Caminho)) { New-Item -Path $Caminho -Force | Out-Null }
-    New-ItemProperty -Path $Caminho -Name $Nome -Value $Valor -PropertyType $Tipo -Force | Out-Null
+    try {
+        if (-not (Test-Path $Caminho)) { New-Item -Path $Caminho -Force -ErrorAction Stop | Out-Null }
+        New-ItemProperty -Path $Caminho -Name $Nome -Value $Valor -PropertyType $Tipo -Force -ErrorAction Stop | Out-Null
+    }
+    catch {
+        Write-Output "AVISO: nao foi possivel definir $Nome ($($_.Exception.Message))"
+    }
 }
 
 # ---------------------------------------------------------------------------
@@ -29,7 +35,8 @@ $remover = @(
     'Microsoft.Xbox.TCUI', 'Microsoft.Edge.GameAssist',
     # apps de consumidor
     'Microsoft.BingNews', 'Microsoft.BingWeather', 'Microsoft.BingSearch', 'Microsoft.WindowsMaps',
-    'Clipchamp.Clipchamp', 'Microsoft.YourPhone', 'Microsoft.People', 'Microsoft.Getstarted',
+    'Clipchamp.Clipchamp', 'Microsoft.YourPhone', 'MicrosoftWindows.CrossDevice',   # integracao com celular pessoal
+    'Microsoft.People', 'Microsoft.Getstarted',
     'Microsoft.GetHelp', 'Microsoft.WindowsFeedbackHub', 'Microsoft.ZuneVideo', 'Microsoft.SkypeApp',
     'Microsoft.MixedReality.Portal', 'Microsoft.Microsoft3DViewer', 'Microsoft.Wallet',
     'Microsoft.Messaging', 'Microsoft.OneConnect', 'microsoft.windowscommunicationsapps',
@@ -98,7 +105,8 @@ try {
     # barra de tarefas e Explorador
     $adv = "$u\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
     Set-Valor $adv 'ShowTaskViewButton' 0        # sem botao Visao de Tarefas
-    Set-Valor $adv 'TaskbarDa' 0                 # sem Widgets
+    # (Widgets: desligados pela politica AllowNewsAndInterests e pela remocao do app.
+    #  O valor TaskbarDa e protegido pelo Windows 11 e nao pode ser alterado por script.)
     Set-Valor $adv 'TaskbarMn' 0                 # sem Chat
     Set-Valor $adv 'Start_IrisRecommendations' 0 # sem recomendacoes no Iniciar
     Set-Valor $adv 'TaskbarAnimations' 0         # sem animacoes na barra
@@ -107,6 +115,10 @@ try {
     Set-Valor "$u\Software\Microsoft\Windows\CurrentVersion\Search" 'SearchboxTaskbarMode' 1   # pesquisa so como icone
     Set-Valor "$u\Software\Policies\Microsoft\Windows\Explorer" 'DisableSearchBoxSuggestions' 1 # sem Bing na pesquisa
     Set-Valor "$u\Software\Policies\Microsoft\Windows\WindowsCopilot" 'TurnOffWindowsCopilot' 1
+    # sem Destaque do Windows (papel de parede com "Saiba mais sobre esta imagem") e dicas
+    Set-Valor "$u\Software\Policies\Microsoft\Windows\CloudContent" 'DisableWindowsSpotlightFeatures' 1
+    Set-Valor "$u\Software\Policies\Microsoft\Windows\CloudContent" 'DisableSpotlightCollectionOnDesktop' 1
+    Set-Valor "$u\Software\Policies\Microsoft\Windows\CloudContent" 'DisableTailoredExperiencesWithDiagnosticData' 1
     # privacidade
     Set-Valor "$u\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo" 'Enabled' 0
     Set-Valor "$u\Software\Microsoft\Windows\CurrentVersion\Privacy" 'TailoredExperiencesWithDiagnosticDataEnabled' 0
@@ -122,6 +134,31 @@ finally {
     [GC]::Collect(); [GC]::WaitForPendingFinalizers(); Start-Sleep -Seconds 2
     reg.exe unload 'HKU\PADRAO' | Out-Null
 }
+
+# ---------------------------------------------------------------------------
+# 4) Barra de tarefas padrao para toda conta nova: so Explorador de Arquivos e Edge
+#    (tira os atalhos fixados de fabrica, como o do "Novo Outlook", que baixa o app ao clicar)
+# ---------------------------------------------------------------------------
+Write-Output '== Definindo a barra de tarefas padrao =='
+$layout = @'
+<?xml version="1.0" encoding="utf-8"?>
+<LayoutModificationTemplate xmlns="http://schemas.microsoft.com/Start/2014/LayoutModification" xmlns:defaultlayout="http://schemas.microsoft.com/Start/2014/FullDefaultLayout" xmlns:start="http://schemas.microsoft.com/Start/2014/StartLayout" xmlns:taskbar="http://schemas.microsoft.com/Start/2014/TaskbarLayout" Version="1">
+  <CustomTaskbarLayoutCollection PinListPlacement="Replace">
+    <defaultlayout:TaskbarLayout>
+      <taskbar:TaskbarPinList>
+        <taskbar:DesktopApp DesktopApplicationID="Microsoft.Windows.Explorer" />
+        <taskbar:DesktopApp DesktopApplicationLinkPath="%ALLUSERSPROFILE%\Microsoft\Windows\Start Menu\Programs\Microsoft Edge.lnk" />
+      </taskbar:TaskbarPinList>
+    </defaultlayout:TaskbarLayout>
+  </CustomTaskbarLayoutCollection>
+</LayoutModificationTemplate>
+'@
+try {
+    $shell = 'C:\Users\Default\AppData\Local\Microsoft\Windows\Shell'
+    New-Item -Path $shell -ItemType Directory -Force | Out-Null
+    Set-Content -Path "$shell\LayoutModification.xml" -Value $layout -Encoding UTF8 -ErrorAction Stop
+}
+catch { Write-Output "AVISO: nao foi possivel definir a barra de tarefas ($($_.Exception.Message))" }
 
 Write-Output '== Otimizacao concluida =='
 Stop-Transcript | Out-Null

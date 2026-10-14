@@ -36,10 +36,24 @@ Um pendrive de instalação pode ser perdido ou copiado, então ele **não guard
 
 ## Como usar
 
-1. Crie um pendrive de instalação do Windows 11 (pela Ferramenta de Criação de Mídia da Microsoft, por exemplo).
-2. Copie para a **raiz** do pendrive o `Autounattend.xml`, a pasta `scripts` e a pasta `instaladores`.
-3. Baixe o instalador offline do Brave (`BraveBrowserStandaloneSilentSetup.exe`, no GitHub oficial do Brave) e coloque na pasta `instaladores`.
-4. Inicie a máquina pelo pendrive.
+1. **Crie o pendrive de instalação do Windows 11** normalmente, com a Ferramenta de Criação de Mídia da Microsoft ou com o Rufus.
+   - No **Rufus**, quando aparecer a janela de personalização do Windows (remover requisitos, criar conta local etc.), **desmarque todas as opções**. Elas fazem o Rufus gerar um `Autounattend.xml` próprio, que entra em conflito com este.
+2. **Baixe o instalador offline do Brave** (`BraveBrowserStandaloneSilentSetup.exe`, no GitHub oficial do Brave) e coloque dentro da pasta `instaladores`.
+3. **Copie para a raiz do pendrive**, ao lado dos arquivos do Windows, o `Autounattend.xml`, a pasta `scripts` e a pasta `instaladores`. Não coloque nada dentro das pastas do instalador do Windows:
+
+   ```
+   PENDRIVE (E:)
+   ├── boot\                (do instalador do Windows, não mexer)
+   ├── efi\                 (do instalador do Windows, não mexer)
+   ├── sources\             (do instalador do Windows, não mexer)
+   ├── setup.exe            (do instalador do Windows, não mexer)
+   ├── Autounattend.xml     <- deste projeto, obrigatoriamente na raiz
+   ├── scripts\             <- deste projeto
+   └── instaladores\        <- deste projeto, com os instaladores offline
+   ```
+
+   O instalador do Windows procura o `Autounattend.xml` sozinho na raiz do pendrive, e a cópia dos scripts procura a pasta `scripts` na raiz de qualquer unidade.
+4. **Inicie a máquina pelo pendrive** (menu de boot da placa-mãe).
 
 > **Atenção:** o `Autounattend.xml` **apaga todo o disco 0** da máquina. Teste antes numa máquina virtual (Hyper-V ou VirtualBox).
 

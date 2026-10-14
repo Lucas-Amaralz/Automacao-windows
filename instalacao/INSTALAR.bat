@@ -54,5 +54,11 @@ if "%FALHAS%"=="0" (echo  Tudo instalado com sucesso.) else (echo  Programas com
 echo ============================================
 echo [%date% %time%] Fim (falhas: %FALHAS%) >> "%LOG%"
 echo.
+rem tudo certo: fecha sozinho. Com falha: fica aberto para o tecnico ver qual programa falhou.
+if "%FALHAS%"=="0" (
+  echo Esta janela fecha sozinha em 5 segundos...
+  timeout /t 5 /nobreak >nul
+  exit
+)
 pause
 exit /b %FALHAS%

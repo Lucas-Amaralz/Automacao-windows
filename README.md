@@ -9,7 +9,8 @@ Baseado em um projeto que desenvolvi por iniciativa própria no meu estágio de 
 1. **Instalação do Windows sem perguntas:** o instalador lê o `Autounattend.xml` e define idioma, teclado ABNT2, fuso horário, particionamento do disco e edição (Windows 11 Pro).
 2. **Cópia dos arquivos:** durante a instalação, os scripts e os instaladores são copiados do pendrive para `C:\Windows\Setup\Scripts`.
 3. **Instalação dos aplicativos:** no fim da instalação, o Windows executa o `SetupComplete.cmd` como SYSTEM, que roda cada script da pasta `apps` e grava um log.
-4. **Conta do usuário:** na tela inicial, quem prepara a máquina cria a conta e a senha. Os instaladores copiados são apagados para liberar espaço.
+4. **Direto para a área de trabalho:** as telas da configuração inicial são puladas e o Windows entra sozinho, uma única vez, numa conta temporária **"Tecnico"**. Os instaladores copiados são apagados para liberar espaço.
+5. **Conta definitiva:** o técnico cria a conta de administrador definitiva e apaga a conta temporária.
 
 ## Estrutura
 
@@ -29,7 +30,7 @@ Para adicionar um programa, basta criar um novo `scripts\apps\instalar-<programa
 
 Um pendrive de instalação pode ser perdido ou copiado, então ele **não guarda credenciais**:
 
-- **Sem usuário e senha de administrador no `Autounattend.xml`.** A conta é criada na hora, na tela inicial.
+- **Nenhuma senha no `Autounattend.xml`.** Para a instalação ir direto até a área de trabalho, o arquivo cria uma conta temporária **"Tecnico" sem senha**, com login automático uma única vez. Logo no primeiro login, ela passa a **exigir uma senha nova** (`net user Tecnico /logonpasswordchg:yes`), então não fica aberta depois. O técnico cria a conta de administrador definitiva e apaga a temporária.
 - **Por que não "esconder" a senha?** O `Autounattend.xml` só aceita a senha em texto puro ou codificada em Base64, que qualquer pessoa reverte em segundos. Não existe opção de hash, porque o Windows precisa da senha original para criar a conta. E, no Windows, até o hash da senha é sensível: ele pode ser usado diretamente em ataques do tipo *pass-the-hash*.
 - **Sem chave de ativação.** O arquivo usa apenas a chave genérica pública da Microsoft, que escolhe a edição mas não ativa o Windows. A ativação vem da licença gravada na placa-mãe ou do licenciamento da empresa.
 - **Em produção**, a senha do administrador local deve ser gerenciada pelo **Windows LAPS** (senha única por máquina, guardada no Active Directory ou no Entra ID e trocada automaticamente).

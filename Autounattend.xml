@@ -6,7 +6,8 @@
   Use somente em equipamentos que vao ser formatados. Teste antes numa maquina virtual.
 
   Seguranca: nao ha senha, hash de senha nem chave de ativacao neste arquivo.
-  A conta de usuario e criada na hora, na tela inicial (OOBE), por quem prepara a maquina.
+  A instalacao entra sozinha numa conta temporaria "Tecnico" sem senha, que passa a exigir senha nova
+  logo no primeiro login. O tecnico cria a conta de administrador definitiva e apaga a temporaria.
   A chave abaixo e a chave GENERICA publica da Microsoft para o Windows 11 Pro: ela so escolhe a
   edicao e NAO ativa o Windows. A ativacao vem da licenca da placa-mae (OEM) ou do licenciamento da empresa.
 -->
@@ -111,7 +112,12 @@
     </component>
   </settings>
 
-  <!-- 3) oobeSystem: idioma da tela inicial e telas que podem ser puladas. A conta e criada pelo tecnico. -->
+  <!--
+    3) oobeSystem: pula todas as telas da configuracao inicial e entra sozinho, uma unica vez,
+       numa conta TEMPORARIA "Tecnico" SEM SENHA. No primeiro login a conta passa a exigir senha nova,
+       e o tecnico cria a conta de administrador definitiva e apaga a "Tecnico".
+       Assim nenhuma senha fica gravada no pendrive.
+  -->
   <settings pass="oobeSystem">
     <component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <InputLocale>0416:00010416</InputLocale>
@@ -123,9 +129,48 @@
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
         <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
         <!-- 3 = nao enviar as configuracoes "recomendadas" de diagnostico -->
         <ProtectYourPC>3</ProtectYourPC>
       </OOBE>
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Name>Tecnico</Name>
+            <DisplayName>Tecnico (temporaria)</DisplayName>
+            <!-- nome do grupo em portugues, porque a ISO e pt-BR -->
+            <Group>Administradores</Group>
+            <Password>
+              <Value></Value>
+              <PlainText>true</PlainText>
+            </Password>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+      <!-- entra sozinho na conta temporaria uma unica vez -->
+      <AutoLogon>
+        <Enabled>true</Enabled>
+        <Username>Tecnico</Username>
+        <Password>
+          <Value></Value>
+          <PlainText>true</PlainText>
+        </Password>
+        <LogonCount>1</LogonCount>
+      </AutoLogon>
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <Order>1</Order>
+          <Description>A conta temporaria passa a exigir senha nova no proximo login</Description>
+          <CommandLine>net user Tecnico /logonpasswordchg:yes</CommandLine>
+        </SynchronousCommand>
+        <SynchronousCommand wcm:action="add">
+          <Order>2</Order>
+          <Description>Lembrete para o tecnico</Description>
+          <CommandLine>msg * "Instalacao concluida. Crie a conta de administrador definitiva e depois apague a conta temporaria Tecnico."</CommandLine>
+        </SynchronousCommand>
+      </FirstLogonCommands>
     </component>
   </settings>
 </unattend>

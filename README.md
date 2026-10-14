@@ -13,6 +13,14 @@ Baseado em um projeto que desenvolvi por iniciativa própria no meu estágio de 
 5. **Aplicativos com dois cliques:** o técnico abre a pasta **Instalacao** e dá dois cliques em **`INSTALAR.bat`**. Ele pede permissão de administrador sozinho, instala os programas sem perguntas e mostra o resultado na tela.
 6. **Conta definitiva:** o técnico cria a conta de administrador definitiva e apaga a conta temporária.
 
+## Demonstração
+
+Windows recém-instalado pela automação, com a pasta **Instalacao** na área de trabalho e o `INSTALAR.bat` em execução (teste em máquina virtual no VirtualBox):
+
+<p align="center">
+  <img src="docs/instalador-em-execucao.png" alt="INSTALAR.bat em execução: cabeçalho 'Super automação de instalação de aplicativos' instalando o Brave" width="85%">
+</p>
+
 ## Estrutura
 
 ```

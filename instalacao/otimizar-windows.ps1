@@ -160,5 +160,33 @@ try {
 }
 catch { Write-Output "AVISO: nao foi possivel definir a barra de tarefas ($($_.Exception.Message))" }
 
+# ---------------------------------------------------------------------------
+# 5) Menu Iniciar padrao para toda conta nova: so apps de trabalho fixados.
+#    Tira os "atalhos de propaganda" de fabrica (Xbox, Solitaire, WhatsApp, LinkedIn,
+#    Outlook...): eles nem estao instalados, so baixam o app quando alguem clica.
+# ---------------------------------------------------------------------------
+Write-Output '== Definindo o menu Iniciar padrao =='
+$iniciar = @'
+{
+  "pinnedList": [
+    { "desktopAppLink": "%ALLUSERSPROFILE%\\Microsoft\\Windows\\Start Menu\\Programs\\Microsoft Edge.lnk" },
+    { "desktopAppLink": "%APPDATA%\\Microsoft\\Windows\\Start Menu\\Programs\\File Explorer.lnk" },
+    { "packagedAppId": "windows.immersivecontrolpanel_cw5n1h2txyewy!microsoft.windows.immersivecontrolpanel" },
+    { "packagedAppId": "Microsoft.WindowsCalculator_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.WindowsNotepad_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.Paint_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.Windows.Photos_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.ScreenSketch_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.WindowsStore_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "MicrosoftCorporationII.QuickAssist_8wekyb3d8bbwe!App" },
+    { "packagedAppId": "Microsoft.WindowsTerminal_8wekyb3d8bbwe!App" }
+  ]
+}
+'@
+try {
+    Set-Content -Path "$shell\LayoutModification.json" -Value $iniciar -Encoding UTF8 -ErrorAction Stop
+}
+catch { Write-Output "AVISO: nao foi possivel definir o menu Iniciar ($($_.Exception.Message))" }
+
 Write-Output '== Otimizacao concluida =='
 Stop-Transcript | Out-Null

@@ -101,9 +101,11 @@ Cada programa precisa de **duas coisas**: o **instalador** na pasta `instaladore
 
    ```bat
    set "ARQUIVO=7z-x64.msi"
-   set "PROGRAMA_EXE=%ProgramFiles%\7-Zip\7zFM.exe"
+   set "BRAVE_EXE=%ProgramFiles%\7-Zip\7zFM.exe"
    msiexec /i "%~dp0..\instaladores\%ARQUIVO%" /qn /norestart
    ```
+
+   No exemplo, a variável continua com o nome `BRAVE_EXE` só para você trocar o mínimo possível. Se quiser, renomeie para `PROGRAMA_EXE`, mas troque em **todas** as linhas do script onde ela aparece.
 
 O `INSTALAR.bat` encontra sozinho todos os `instalar-*.bat` da pasta `apps` e roda em ordem alfabética.
 

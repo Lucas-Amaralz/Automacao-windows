@@ -93,7 +93,7 @@
     </component>
   </settings>
 
-  <!-- 2) specialize: nome do computador, fuso horario e copia dos scripts/instaladores do pendrive -->
+  <!-- 2) specialize: nome do computador, fuso horario e copia da pasta "instalacao" do pendrive para a area de trabalho -->
   <settings pass="specialize">
     <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
       <!-- "*" gera um nome aleatorio; o nome definitivo pode seguir o padrao da empresa depois -->
@@ -104,9 +104,14 @@
       <RunSynchronous>
         <RunSynchronousCommand wcm:action="add">
           <Order>1</Order>
-          <Description>Copia scripts e instaladores do pendrive para C:\Windows\Setup\Scripts</Description>
-          <!-- procura o pendrive pela pasta scripts e copia tudo; o Windows roda o SetupComplete.cmd no fim da instalacao -->
-          <Path>cmd /c for %i in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if exist %i:\scripts\SetupComplete.cmd (xcopy /e /i /y /q %i:\scripts C:\Windows\Setup\Scripts &amp; xcopy /e /i /y /q %i:\instaladores C:\Windows\Setup\Scripts\instaladores)</Path>
+          <Description>Copia a pasta instalacao do pendrive para a area de trabalho publica</Description>
+          <!-- procura o pendrive pela pasta "instalacao" e copia para a area de trabalho de todos os usuarios -->
+          <Path>cmd /c for %i in (D E F G H I J K L M N O P Q R S T U V W X Y Z) do if exist %i:\instalacao\INSTALAR.bat xcopy /e /i /y /q %i:\instalacao C:\Users\Public\Desktop\Instalacao</Path>
+        </RunSynchronousCommand>
+        <RunSynchronousCommand wcm:action="add">
+          <Order>2</Order>
+          <Description>Remove apps e recursos inuteis para o trabalho e deixa o Windows leve (log em C:\Windows\Temp\otimizacao.log)</Description>
+          <Path>powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\Public\Desktop\Instalacao\otimizar-windows.ps1</Path>
         </RunSynchronousCommand>
       </RunSynchronous>
     </component>
@@ -168,7 +173,7 @@
         <SynchronousCommand wcm:action="add">
           <Order>2</Order>
           <Description>Lembrete para o tecnico</Description>
-          <CommandLine>msg * "Instalacao concluida. Crie a conta de administrador definitiva e depois apague a conta temporaria Tecnico."</CommandLine>
+          <CommandLine>msg * "Windows instalado. 1) Na area de trabalho, abra a pasta Instalacao e de dois cliques em INSTALAR. 2) Crie a conta de administrador definitiva e apague a conta temporaria Tecnico."</CommandLine>
         </SynchronousCommand>
       </FirstLogonCommands>
     </component>

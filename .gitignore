@@ -1,6 +1,7 @@
 # instaladores e imagens não vão para o repositório
-instaladores/*
-!instaladores/LEIA-ME.txt
+instalacao/instaladores/*
+!instalacao/instaladores/LEIA-ME.txt
+instalacao/instalacao.log
 *.exe
 *.msi
 *.iso

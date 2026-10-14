@@ -14,10 +14,8 @@ rem ============================================================================
 
 set "ARQUIVO=BraveBrowserStandaloneSilentSetup.exe"
 set "BRAVE_EXE=%ProgramFiles%\BraveSoftware\Brave-Browser\Application\brave.exe"
-
-rem procura o instalador: depois da copia (Scripts\instaladores) ou no pendrive (raiz\instaladores)
+rem o instalador fica na pasta "instaladores", ao lado da pasta "apps"
 set "INSTALADOR=%~dp0..\instaladores\%ARQUIVO%"
-if not exist "%INSTALADOR%" set "INSTALADOR=%~dp0..\..\instaladores\%ARQUIVO%"
 
 if exist "%BRAVE_EXE%" (
   echo Brave ja esta instalado.
@@ -29,11 +27,13 @@ if not exist "%INSTALADOR%" (
 )
 
 echo Instalando o Brave...
-"%INSTALADOR%"
+rem "start" sem /wait: o instalador do Brave pode deixar processos abertos (o atualizador)
+rem e nunca "devolver" o controle. Por isso o script nao espera ele fechar: so confere
+rem se o brave.exe apareceu, por ate cerca de 5 minutos.
+start "" "%INSTALADOR%"
 
-rem o instalador pode terminar antes do Brave ficar pronto: espera ate cerca de 2 minutos
-rem (ping no lugar de timeout, que nao funciona quando roda sem janela, como SYSTEM)
-for /l %%i in (1,1,24) do (
+rem (ping no lugar de timeout, que falha quando nao ha janela interativa)
+for /l %%i in (1,1,60) do (
   if exist "%BRAVE_EXE%" goto :ok
   ping -n 6 127.0.0.1 >nul
 )
@@ -41,5 +41,7 @@ echo O Brave nao foi encontrado em "%BRAVE_EXE%".
 exit /b 3
 
 :ok
+rem da alguns segundos para o instalador terminar de gravar os arquivos e atalhos
+ping -n 11 127.0.0.1 >nul
 echo Brave instalado com sucesso.
 exit /b 0
